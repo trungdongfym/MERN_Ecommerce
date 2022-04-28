@@ -1,6 +1,6 @@
 const httpErrors = require('../helpers/httpErrors');
 const { verifyToken } = require('../helpers/processToken');
-const { findOneByAnyField } = require('../DAO/usersDAO');
+const { findOneByAnyField } = require('../controller.DAO/usersDAO');
 
 const authRequire = (roleArray) => {
    return async (req, res, next) => {

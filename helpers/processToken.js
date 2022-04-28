@@ -1,12 +1,13 @@
 const jwt = require('jsonwebtoken');
+const tokenConst = require('../utils/constants/tokenConstants');
 
 const verifyToken = async (token, type) => {
    try {
       switch (type) {
-         case 'access':
+         case tokenConst.accessType:
             const accessPayload = await jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
             return accessPayload;
-         case 'refresh':
+         case tokenConst.refreshType:
             const refreshPayload = await jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
             return refreshPayload;
          default:
@@ -20,11 +21,11 @@ const verifyToken = async (token, type) => {
 const createToken = async (payload, type, options) => {
    try {
       switch (type) {
-         case 'access':
+         case tokenConst.accessType:
             const accessToken = await jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, options);
             return accessToken;
-         case 'refresh':
-            const refreshToken = await jwt.verify(payload, process.env.REFRESH_TOKEN_SECRET, options);
+         case tokenConst.refreshType:
+            const refreshToken = await jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, options);
             return refreshToken;
          default:
             throw new Error('Invalid tokenType');

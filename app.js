@@ -1,24 +1,22 @@
 require('dotenv').config();
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
 const bodyparser = require('body-parser');
 
+const mongoDBConnect = require('./helpers/DBConnect/mongoConnect');
+const redisClient = require('./helpers/DBConnect/redisConnect');
 // Handle Errors
 const { handleHttpErros } = require('./middlewares/handleErrors');
 // Router
 const routerAccount = require('./routes/customers/account.route');
 const authRouter = require('./routes/auth.route');
 
-const PORT = process.env.PORT || 5000;
+// Database connect
+mongoDBConnect(process.env.DB_URL);
+redisClient.connect();
 
-mongoose.connect(process.env.DB_URL);
-mongoose.connection.on('error', (err) => {
-  console.log('Mongodb connection error::', err.message);
-}).once('open', () => {
-  console.log('Mongodb connected');
-});
+const PORT = process.env.PORT || 5000;
 
 const app = express();
 const Router = express.Router();

@@ -6,7 +6,8 @@ const { hashData } = require('../helpers/hashBscypt');
 const userShema = new Schema({
    email: { type: String, required: true, unique: true, maxlength: 50, minlength: 3 },
    password: {
-      type: String, required: () => {
+      type: String,
+      required: () => {
          return this.methodLogin === 'normal';
       }
    },
@@ -15,9 +16,9 @@ const userShema = new Schema({
       enum: userConstants.methodLoginArray,
       default: userConstants.methodLoginEnum.normal,
    },
-   avatar: { type: String },
-   phone: { type: String, },
-   address: { type: String },
+   avatar: { type: String, default: '' },
+   phone: { type: String, default: '' },
+   address: { type: String, default: '' },
    role: {
       type: String,
       enum: userConstants.roleArray,
@@ -28,10 +29,16 @@ const userShema = new Schema({
 });
 
 //Hash password previous save
-userShema.pre('save', async function (next)  {
+userShema.pre('save', async function (next) {
    try {
       if (this.password) {
+         if (this.password === '') {
+            next();
+            return;
+         }
          this.password = await hashData(this.password);
+      } else if (this.methodLogin !== userConstants.methodLoginEnum.normal) {
+         this.password = ''
       } else throw new Error('Password invalid');
       next();
    } catch (error) {

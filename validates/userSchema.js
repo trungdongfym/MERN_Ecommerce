@@ -14,7 +14,7 @@ exports.registerUserSchema = Joi.object().keys({
       {
          is: userConstants.methodLoginEnum.normal,
          then: Joi.string().pattern(regexPassword).required(),
-         otherwise: Joi.string().pattern(regexPassword)
+         otherwise: Joi.string().allow('')
       }
    ),
    confirmPassword: Joi.ref('password'),
@@ -33,7 +33,25 @@ exports.loginUserSchema = Joi.object().keys({
       tlds: { allow: false }
    }).required(),
    password: Joi.string().required(),
-   methodLogin: Joi.string().required()
+   methodLogin: Joi.string().allow(userConstants.methodLoginEnum.normal).required(),
+   rememberMe: Joi.boolean().default(true).required()
+});
+
+exports.loginWith3rdPartySchema = Joi.object().keys({
+   user: Joi.object().keys({
+      uid: Joi.string().required(),
+      name: Joi.string().required(),
+      email: Joi.string().required(),
+      phone: Joi.string().allow(''),
+      avatar: Joi.string().allow(''),
+   }),
+   token: Joi.object().keys({
+      refreshToken: Joi.string().required(),
+      accessToken: Joi.string().required()
+   }),
+   isNewUser: Joi.boolean().required(),
+   rememberMe: Joi.boolean().required(),
+   methodLogin: Joi.string().allow(userConstants.methodLoginEnum.google, userConstants.methodLoginEnum.facebook),
 });
 
 exports.updateUserSchema = Joi.object().keys({
