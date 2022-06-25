@@ -7,17 +7,17 @@ function uploadImage(fieldName, destination) {
       },
       filename: function (req, file, cb) {
          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-         cb(null, file.fieldname + '-' + uniqueSuffix);
+         cb(null, file.fieldname + '-' + uniqueSuffix + file.originalname);
       }
    });
 
    const upload = multer({
       storage: storage,
       limits: {
-         fileSize: 1024 * 1024 * 5 //5MB
+         fileSize: 1024 * 1024  //1MB
       },
       fileFilter: function (req, file, cb) {
-         const fileTypes = /jpeg|jpg|png|gif/;
+         const fileTypes = /jpeg|jpg|png/;
          const mimeType = fileTypes.test(file.mimetype);
          if (mimeType) cb(null, true);
          cb(null, false);
@@ -31,6 +31,7 @@ function uploadImage(fieldName, destination) {
          } else if (err) {
             next(err);
          }
+         next();
       });
    }
 }

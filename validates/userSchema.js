@@ -33,7 +33,7 @@ exports.loginUserSchema = Joi.object().keys({
       tlds: { allow: false }
    }).required(),
    password: Joi.string().required(),
-   methodLogin: Joi.string().allow(userConstants.methodLoginEnum.normal).required(),
+   methodLogin: Joi.string().valid(userConstants.methodLoginEnum.normal).required(),
    rememberMe: Joi.boolean().default(true).required()
 });
 
@@ -51,7 +51,7 @@ exports.loginWith3rdPartySchema = Joi.object().keys({
    }),
    isNewUser: Joi.boolean().required(),
    rememberMe: Joi.boolean().required(),
-   methodLogin: Joi.string().allow(userConstants.methodLoginEnum.google, userConstants.methodLoginEnum.facebook),
+   methodLogin: Joi.string().valid(userConstants.methodLoginEnum.google, userConstants.methodLoginEnum.facebook),
 });
 
 exports.updateUserSchema = Joi.object().keys({

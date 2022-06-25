@@ -1,6 +1,7 @@
 const httpErrors = require('../helpers/httpErrors');
 const { verifyToken } = require('../helpers/processToken');
-const { findOneByAnyField } = require('../controller.DAO/usersDAO');
+const { findOneByAnyFieldDAO } = require('../controller.DAO/usersDAO');
+const tokenConst = require('../utils/constants/tokenConstants');
 
 const authRequire = (roleArray) => {
    return async (req, res, next) => {
@@ -9,16 +10,16 @@ const authRequire = (roleArray) => {
          res.json(httpErrors.Unauthorized('Unauthorizaiton'));
          return;
       }
-      
+
       try {
-         const userPayload = await verifyToken(accessToken, process.env.ACCESS_TOKEN_SECRET);
+         const userPayload = await verifyToken(accessToken, tokenConst.accessType);
          const { _id, role } = userPayload;
-         if (roleArray.includes(role)) {
+         if (!roleArray.includes(role)) {
             res.json(httpErrors.Forbiden('Not permission'));
             return;
          }
-         const realUser = await findOneByAnyField(_id);
-         if (!realUser && role !== realUser.role) {
+         const realUser = await findOneByAnyFieldDAO({ _id });
+         if (!realUser || (realUser && role !== realUser.role)) {
             res.status(401).json('Invalid token');
             return;
          }
@@ -32,6 +33,7 @@ const authRequire = (roleArray) => {
             res.status(401).json(error.message);
             return;
          }
+         console.log(error);
          res.status(500).json('Internal server errors');
       }
    }

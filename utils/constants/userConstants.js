@@ -10,12 +10,28 @@ const roleEnum = {
    Custommer: 'Custommer'
 }
 
+const genderEnum = {
+   male: 'Male',
+   female: 'Female',
+   other: 'Other',
+   default: ''
+}
+
+const pathImageEnum = {
+   avatarPath: './public/userAvatars/',
+   productImagePath: './public/productImgs/'
+}
+
 const roleArray = Object.values(roleEnum);
 const methodLoginArray = Object.values(methodLoginEnum);
+const genderArray = Object.values(genderEnum);
 
 module.exports = {
    roleEnum,
    roleArray,
    methodLoginEnum,
-   methodLoginArray
+   methodLoginArray,
+   genderEnum,
+   genderArray,
+   pathImageEnum
 }

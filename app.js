@@ -11,6 +11,7 @@ const { handleHttpErros } = require('./middlewares/handleErrors');
 // Router
 const routerAccount = require('./routes/customers/account.route');
 const authRouter = require('./routes/auth.route');
+const routerUserCommon = require('./routes/users.route');
 
 // Database connect
 mongoDBConnect(process.env.DB_URL);
@@ -35,6 +36,7 @@ app.use('*', cors({
 
 Router.use('/user', routerAccount);
 Router.use('/user', authRouter);
+Router.use('/user',routerUserCommon);
 
 app.use('/api', Router);
 

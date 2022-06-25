@@ -11,9 +11,9 @@ const { authFirebase } = require('../firebase');
 
 const createDataLoginUserSent = async (user, rememberMe) => {
    try {
-      const { email, role, avatar, methodLogin } = user;
+      const { email, role, avatar, methodLogin, name } = user;
       const userID = user._id;
-      const userPayload = { email, role, avatar, _id: userID, methodLogin };
+      const userPayload = { email, role, avatar, _id: userID, methodLogin, name };
 
       const accessToken = await createToken(userPayload, tokenConst.accessType, {
          expiresIn: tokenConst.accessTokenExpireTime
@@ -106,17 +106,19 @@ const loginNormal = async (userLoginPayload) => {
 
 const loginThirdParty = async (userLoginPayload) => {
    const customError = customErrors.invalidAccount('Account invalid!');
-   const customErrorPayload = new DataSendFormat(false, null,
-      customError
-   );
+   const customErrorPayload = new DataSendFormat(false, null, customError);
+   let userUidFirebase = null;
    try {
       const { isNewUser, rememberMe, methodLogin, user, token } = userLoginPayload;
       const { uid, email } = user;
+      // Check user database
+
       // Verify with firebase admin
       const userPayloadThirdParty = await authFirebase.verifyIdToken(token.accessToken);
       const { uid: uidReal } = userPayloadThirdParty;
       if (uid !== uidReal) return customErrorPayload;
 
+      userUidFirebase = uid;
       // Create userdata
       delete user.uid;
       user.role = userConst.roleEnum.Custommer;
@@ -126,14 +128,19 @@ const loginThirdParty = async (userLoginPayload) => {
       if (isNewUser) {
          // Save user to mongodb
          userSaved = await registerUser(user);
-      } else userSaved = await findOneByAnyFieldDAO({ email });
+      } else {
+         userSaved = await findOneByAnyFieldDAO({ email });
+         if (!userSaved) userSaved = await registerUser(user);
+      }
       if (!userSaved) throw new Error('Không lưu được người dùng mới!');
       // Create user data sent do client
       userSaved._id = userSaved.id;
-      console.log(userSaved);
       const dataUserLoginSent = await createDataLoginUserSent(userSaved, rememberMe);
       return dataUserLoginSent;
    } catch (error) {
+      if (error instanceof httpErrors && error.status === 409) {
+         authFirebase.deleteUser(userUidFirebase);
+      }
       throw error;
    }
 }

@@ -5,6 +5,7 @@ const { hashData } = require('../helpers/hashBscypt');
 
 const userShema = new Schema({
    email: { type: String, required: true, unique: true, maxlength: 50, minlength: 3 },
+   name: { type: String, required: true },
    password: {
       type: String,
       required: () => {
@@ -19,6 +20,16 @@ const userShema = new Schema({
    avatar: { type: String, default: '' },
    phone: { type: String, default: '' },
    address: { type: String, default: '' },
+   gender:{
+      type: String, 
+      enum: userConstants.genderArray,
+      default: userConstants.genderEnum.default,
+      required:false
+   },
+   dateOfBirth: {
+      type: Date,
+      required:false
+   },
    role: {
       type: String,
       enum: userConstants.roleArray,

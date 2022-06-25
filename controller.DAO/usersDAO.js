@@ -23,7 +23,20 @@ async function registerUserDAO(userData) {
    }
 }
 
+async function updateUserDAO(userID, userUpdate) {
+   try {
+      const userUpdated = await Users.findOneAndUpdate({_id:userID}, userUpdate, {
+         new:true,
+         runValidators:true
+      }).exec();
+      return userUpdated;
+   } catch (error) {
+      throw error;
+   }
+}
+
 module.exports = {
    findOneByAnyFieldDAO,
-   registerUserDAO
+   registerUserDAO,
+   updateUserDAO
 }
