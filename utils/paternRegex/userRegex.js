@@ -1,4 +1,5 @@
 module.exports = {
    regexPhoneNumber: / /,
-   regexPassword: /^(?=.*[A-Z]+.*)(?=.*(\W|\d)+.*).{6,30}$/
+   regexPassword: /^(?=.*[A-Z]+.*)(?=.*(\W|\d)+.*).{6,30}$/,
+   regexNoSpace: /^\S+$/
 }

@@ -1,8 +1,9 @@
 const Joi = require('joi');
+const { checkEmail } = require('../controller/user.controller');
 const userConstants = require('../utils/constants/userConstants');
-const { regexPassword } = require('../utils/paternRegex/userRegex')
+const { regexPassword, regexNoSpace } = require('../utils/paternRegex/userRegex')
 
-exports.registerUserSchema = Joi.object().keys({
+const registerUserSchema = Joi.object().keys({
    name: Joi.string().required(),
    email: Joi.string()
       .email({
@@ -28,7 +29,7 @@ exports.registerUserSchema = Joi.object().keys({
       .default(userConstants.roleEnum.Custommer),
 });
 
-exports.loginUserSchema = Joi.object().keys({
+const loginUserSchema = Joi.object().keys({
    email: Joi.string().email({
       tlds: { allow: false }
    }).required(),
@@ -37,7 +38,7 @@ exports.loginUserSchema = Joi.object().keys({
    rememberMe: Joi.boolean().default(true).required()
 });
 
-exports.loginWith3rdPartySchema = Joi.object().keys({
+const loginWith3rdPartySchema = Joi.object().keys({
    user: Joi.object().keys({
       uid: Joi.string().required(),
       name: Joi.string().required(),
@@ -54,6 +55,48 @@ exports.loginWith3rdPartySchema = Joi.object().keys({
    methodLogin: Joi.string().valid(userConstants.methodLoginEnum.google, userConstants.methodLoginEnum.facebook),
 });
 
-exports.updateUserSchema = Joi.object().keys({
+function updateUserSchemaFunction(data){
+   const updateUserSchema = Joi.object().keys({
+      _id:Joi.string().required(),
+      name:Joi.string().required(),
+      email:Joi.string().external( async(email,helper)=>{ //custom validate async function
+         try {
+            const user = await checkEmail(email);
+            const { _id: userUpdateId = null } = data; //id of the user need update
+            const userEmailExist = user?.id; //id of the user whose email the updater wants to update
+            if(userUpdateId && userUpdateId===userEmailExist) return email;
+            if(user) {
+               throw new Error('Email đã tồn tại!');
+            }
+            return email;
+         } catch (error) {
+            throw new Error(error.message);
+         }
+      },'Email is exist!').required(),
+      address:Joi.string().allow(''),
+      phone:Joi.string().allow(''),
+      gender:Joi.string().allow(''),
+      dateOfBirth:Joi.date().allow(null).allow(''),
+   });
+   return updateUserSchema;
+}
 
+const changePasswordSchema = Joi.object().keys({
+   oldPassword:Joi.string().required().pattern(regexNoSpace),
+   newPassword:Joi.string()
+      .pattern(regexPassword)
+      .pattern(regexNoSpace)
+      .required()
+      .invalid(Joi.ref('oldPassword')),
+   confirmNewPassword:Joi.string()
+      .pattern(regexNoSpace)
+      .valid(Joi.ref('newPassword')),
 });
+
+module.exports={
+   updateUserSchemaFunction,
+   registerUserSchema,
+   loginUserSchema,
+   loginWith3rdPartySchema,
+   changePasswordSchema
+}

@@ -7,10 +7,11 @@ const authRequire = (roleArray) => {
    return async (req, res, next) => {
       const accessToken = req.get('authorization')?.split(' ')[1];
       if (!accessToken) {
-         res.json(httpErrors.Unauthorized('Unauthorizaiton'));
+         const unAuthorization = httpErrors.Unauthorized('Unauthorizaiton');
+         res.status(unAuthorization.status).json(unAuthorization.message);
          return;
       }
-
+      
       try {
          const userPayload = await verifyToken(accessToken, tokenConst.accessType);
          const { _id, role } = userPayload;
@@ -33,7 +34,6 @@ const authRequire = (roleArray) => {
             res.status(401).json(error.message);
             return;
          }
-         console.log(error);
          res.status(500).json('Internal server errors');
       }
    }

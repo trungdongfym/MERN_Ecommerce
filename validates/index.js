@@ -1,9 +1,21 @@
-const { registerUserSchema, loginUserSchema, loginWith3rdPartySchema } = require('./userSchema');
-const { validateDataRequest } = require('./validate');
+const { registerUserSchema, 
+   loginUserSchema, 
+   loginWith3rdPartySchema, 
+   updateUserSchemaFunction,
+   changePasswordSchema,
+} = require('./userSchema');
+const {
+   addProductsSchema
+} = require('./productsSchema');
+const { validateDataRequest, validateData } = require('./validate');
 
 module.exports = {
    registerUserSchema,
    loginUserSchema,
    validateDataRequest,
-   loginWith3rdPartySchema
+   loginWith3rdPartySchema,
+   updateUserSchemaFunction,
+   validateData,
+   changePasswordSchema,
+   addProductsSchema
 }

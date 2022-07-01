@@ -19,8 +19,11 @@ function uploadImage(fieldName, destination) {
       fileFilter: function (req, file, cb) {
          const fileTypes = /jpeg|jpg|png/;
          const mimeType = fileTypes.test(file.mimetype);
-         if (mimeType) cb(null, true);
-         cb(null, false);
+         if (mimeType) {
+            cb(null, true);
+            return;
+         }
+         cb(new Error('File is invalid!'), false);
       }
    }).single(fieldName);
 
@@ -28,8 +31,10 @@ function uploadImage(fieldName, destination) {
       upload(req, res, function (err) {
          if (err instanceof multer.MulterError) {
             res.status(204).json('Upload file failure!');
+            return;
          } else if (err) {
             next(err);
+            return;
          }
          next();
       });

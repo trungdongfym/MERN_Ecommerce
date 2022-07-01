@@ -5,10 +5,13 @@ const { uploadImage } = require('../middlewares/uploadImage');
 const {authRequire} = require('../middlewares/authRequire');
 const {roleArray, pathImageEnum} = require('../utils/constants/userConstants');
 const httpErrors = require('../helpers/httpErrors');
-const {updateUserDAO} = require('../controller.DAO/usersDAO');
+const {updateUserDAO, updateOneUserDAO} = require('../controller.DAO/usersDAO');
 const { removeFileAsync } = require('../helpers/processFile');
 const DataSendFormat = require('../helpers/dataPayload');
 const {findOneByAnyFieldDAO} = require('../controller.DAO/usersDAO');
+const { updateUserSchemaFunction, validateData, changePasswordSchema } = require('../validates');
+const { checkEmail } = require('../controller/user.controller');
+const {checkDataHash} = require('../helpers/hashBscypt');
 
 routerUserCommon.get(
    '/getUser/:userID',
@@ -28,8 +31,21 @@ routerUserCommon.get(
 
 routerUserCommon.post(
    '/updateUser',
-   authRequire(roleArray),
+   // authRequire(roleArray),
    uploadImage('avatar', './public/userAvatars') ,
+   async (req, res, next) => {
+      const data = req.body;
+      const { file = null } = req;
+      try {
+         // delete field avatar
+         const isValid = await validateData(updateUserSchemaFunction(data), data);
+         if(isValid) next();
+         else if(file) removeFileAsync(file.path);
+      } catch (error) {
+         if(file) removeFileAsync(file.path);
+         next(error);
+      }
+   },
    async (req, res) => {
       const { file = null } = req;
       if(file){
@@ -41,17 +57,21 @@ routerUserCommon.post(
       }
       // get user id for update user
       const {_id:userID = null} = req.body;
-      if(!userID){
-         const badRequestErr = httpErrors.BadRequest('No userid!');
-         res.status(badRequestErr.status).json(badRequestErr.message).end();
-      } else delete req.body._id; 
+      delete req.body._id; 
       
       try {
          const userUpdate = req.body;
          let oldPathAvt = null;
+         const userOld = await findOneByAnyFieldDAO({_id:userID});
+         // if userid for update not exist
+         if(!userOld) {
+            if(file) removeFileAsync(file.path);
+            const badRequestErr = httpErrors.BadRequest('No userid!');
+            res.status(badRequestErr.status).json(badRequestErr.message).end();
+            return;
+         }
          // find old user to get old path of avatar
          if(file){
-            const userOld = await findOneByAnyFieldDAO({_id:userID});
             const {avatar} = userOld;
             const avatarSplit = avatar.split('/');
             // get path avatar old to remove
@@ -79,9 +99,9 @@ routerUserCommon.post('/checkEmail', async (req,res) => {
    const { email } = req.body;
    if(email){
       try {
-         const userFinded = await findOneByAnyFieldDAO({email});
-         if(userFinded) res.json({isExist:true});
-         else res.json({isExist:false});
+         const userExist = await checkEmail(email);
+         const isExist = userExist ? true:false;
+         res.json({isExist:isExist});
       } catch (error) {
          res.status(500).json(error.message);
       }
@@ -90,5 +110,50 @@ routerUserCommon.post('/checkEmail', async (req,res) => {
       res.status(badRequestErr.status).json(badRequestErr.message);
    }
 });
+
+routerUserCommon.post(
+   '/changePassword/:userID', 
+   authRequire(roleArray),
+   async (req, res, next) =>{
+      const data = req.body;
+      try {
+         const value = await validateData(changePasswordSchema,data);
+         if(value) next();
+      } catch (error) {
+         next(error);
+      }
+   },
+   async (req, res) => {
+      const dataPassChange = req.body;
+      const {userID} = req.params;
+      const badRequestErr = httpErrors.BadRequest('Missing userid!');
+
+      if(userID){
+         const { newPassword, oldPassword } = dataPassChange;
+         const user = await findOneByAnyFieldDAO({_id:userID});
+         const dataPayload = new DataSendFormat();
+         // Check old password
+         if(await checkDataHash(oldPassword, user.password)){
+            const result = await updateOneUserDAO({password:newPassword},userID);
+            if(result.modifiedCount > 0) {
+               dataPayload.setStatus = true;
+               res.json(dataPayload);
+            }
+            else {
+               dataPayload.setStatus = false;
+               dataPayload.setErrors = new Error('Lỗi không xác định!');
+               res.json(dataPayload);
+            }
+         } else{
+            dataPayload.setStatus = false;
+            dataPayload.setErrors = 'Mật khẩu cũ không chính xác!';
+            res.json(dataPayload);
+         }
+      }else {
+         res.status(badRequestErr.status).json(error.message);
+         return;;
+      }
+   }
+);
 
 module.exports = routerUserCommon;

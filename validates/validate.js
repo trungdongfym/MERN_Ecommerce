@@ -22,6 +22,22 @@ const validateDataRequest = () => async (req, res, next) => {
    }
 }
 
+const validateData = async (validationSchema, data) => {
+   if (!data) {
+      throw httpErrors.BadRequest('No data body');
+   }
+   try {
+      const value = await validationSchema.validateAsync(data);
+      return value;
+   } catch (error) {
+      if (error?.isJoi) {
+         throw httpErrors.BadRequest(error.message);
+      }
+      throw new Error(error.message);
+   }
+}
+
 module.exports = {
-   validateDataRequest
+   validateDataRequest,
+   validateData
 }

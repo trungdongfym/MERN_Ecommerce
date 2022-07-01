@@ -25,7 +25,7 @@ class DataSendFormat {
    }
 
    set setErrors(newErrors) {
-      this.Errors = newErrors;
+      this.errors = newErrors;
    }
 }
 

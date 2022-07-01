@@ -35,8 +35,18 @@ async function updateUserDAO(userID, userUpdate) {
    }
 }
 
+async function updateOneUserDAO(userChange, userID){
+   try {
+      const res = await Users.updateOne({_id:userID},{...userChange}).exec();
+      return res;
+   } catch (error) {
+      throw error;
+   }
+}
+
 module.exports = {
    findOneByAnyFieldDAO,
    registerUserDAO,
-   updateUserDAO
+   updateUserDAO,
+   updateOneUserDAO
 }

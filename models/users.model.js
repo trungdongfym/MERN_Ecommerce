@@ -57,5 +57,15 @@ userShema.pre('save', async function (next) {
    }
 });
 
+userShema.pre('updateOne', async function(next){
+   try {
+      const password = this?._update?.password;
+      if(password) this._update.password = await hashData(password);
+      next();
+   } catch (error) {
+      throw error;
+   }
+});
+
 const Users = mongoose.model('Users', userShema, 'Users');
 module.exports = Users;
