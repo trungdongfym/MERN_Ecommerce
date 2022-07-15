@@ -4,9 +4,23 @@ const { registerUserSchema,
    updateUserSchemaFunction,
    changePasswordSchema,
 } = require('./userSchema');
+
 const {
-   addProductsSchema
+   addProductsSchema,
+   addImportProductsSchema,
+   updateProductsSchema
 } = require('./productsSchema');
+
+const {
+   addCategorySchema,
+   updateCategorySchema
+} = require('./categorySchema');
+
+const {
+   addProductToCartSchema,
+   updateCartSchema
+} = require('./cartSchema');
+
 const { validateDataRequest, validateData } = require('./validate');
 
 module.exports = {
@@ -17,5 +31,11 @@ module.exports = {
    updateUserSchemaFunction,
    validateData,
    changePasswordSchema,
-   addProductsSchema
+   addProductsSchema,
+   addImportProductsSchema,
+   updateProductsSchema,
+   updateCategorySchema,
+   addCategorySchema,
+   addProductToCartSchema,
+   updateCartSchema
 }

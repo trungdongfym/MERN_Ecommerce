@@ -14,6 +14,9 @@ const authRouter = require('./routes/auth.route');
 const routerUserCommon = require('./routes/users.route');
 const routerCategories = require('./routes/admin/categories.route');
 const routerProducts = require('./routes/products.route');
+const routerImportProducts = require('./routes/admin/importProducts.route');
+const routerWarehoues = require('./routes/admin/wareHouse.route');
+const routerCart = require('./routes/customers/cart.route');
 
 // Database connect
 mongoDBConnect(process.env.DB_URL);
@@ -40,7 +43,10 @@ Router.use('/user', routerAccount);
 Router.use('/user', authRouter);
 Router.use('/user', routerUserCommon);
 Router.use('/admin', routerCategories);
+Router.use('/admin', routerImportProducts);
+Router.use('/admin', routerWarehoues);
 Router.use('/', routerProducts);
+Router.use('/', routerCart);
 
 app.use('/api', Router);
 

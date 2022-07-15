@@ -19,7 +19,8 @@ const genderEnum = {
 
 const pathImageEnum = {
    avatarPath: './public/userAvatars/',
-   productImagePath: './public/productImgs/'
+   productImagePath: './public/productImgs/',
+   avatarOfCatePath: './public/categoriesAvatar/'
 }
 
 const roleArray = Object.values(roleEnum);

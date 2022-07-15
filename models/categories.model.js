@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 
 const categoriesSchema = new Schema({
    name: { type: String, required: true },
+   avatarOfCate: { type: String, required: true },
    describe: { type: String },
    note: { type: String }
 }, {

@@ -11,7 +11,7 @@ const authRequire = (roleArray) => {
          res.status(unAuthorization.status).json(unAuthorization.message);
          return;
       }
-      
+
       try {
          const userPayload = await verifyToken(accessToken, tokenConst.accessType);
          const { _id, role } = userPayload;
@@ -34,11 +34,37 @@ const authRequire = (roleArray) => {
             res.status(401).json(error.message);
             return;
          }
-         res.status(500).json('Internal server errors');
+         res.status(500).json(error.message);
       }
    }
 }
 
+const authOnlyOne = async (checkID, accessToken, priorityRoleArray) => {
+   try {
+      if(!accessToken){
+         throw httpErrors.Unauthorized('Not token!');
+      }
+      const userPayload = await verifyToken(accessToken, tokenConst.accessType);
+      const { _id, role } = userPayload;
+      if (priorityRoleArray.includes(role)) {
+         return true;
+      }
+      if(checkID !== _id){
+         return false;
+      }
+      return true;
+   } catch (error) {
+      if (error?.name === 'TokenExpiredError') {
+         throw httpErrors.Unauthorized('Token expired');
+      }
+      if (error?.name === 'JsonWebTokenError') {
+         throw httpErrors.Unauthorized(error.message);
+      }
+      throw new httpErrors(500, error.message);
+   }
+}
+
 module.exports = {
-   authRequire
+   authRequire,
+   authOnlyOne
 }

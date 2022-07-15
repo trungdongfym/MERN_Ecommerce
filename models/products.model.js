@@ -7,6 +7,7 @@ const productsSchema = new Schema({
    price: { type: Number, required: true },
    image: { type: String, required: true },
    note: { type: String },
+   sale: { type: Number, default: 0 },
    category: { type: Schema.Types.ObjectId, required: true, ref: 'Categories' }
 }, {
    versionKey: false,

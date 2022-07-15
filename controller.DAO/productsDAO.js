@@ -10,11 +10,38 @@ const addProductsDAO = async (product) => {
    }
 }
 
-async function getProductsDAO(limit, skip) {
+async function getProductsDAO(objectQuery) {
+   let { limit, skip, requireCate, match, flashSale } = objectQuery;
    try {
-      if (limit && skip) return await Products.find({}).skip(skip).limit(limit).populate('category').exec();
-      if (skip) return await Products.find({}).skip(skip).populate('category').exec();
-      return await Products.find({}).populate('category').exec();
+      let queryProducts = null;
+      if (flashSale) {
+         match = {
+            ...match,
+            $and: [{ sale: { $exists: true } }, { sale: { $gt: 0 } }]
+         }
+      }
+      if (match) {
+         queryProducts = Products.find(match);
+      } else {
+         queryProducts = Products.find({});
+      }
+      if (skip) {
+         queryProducts.skip(skip);
+      }
+      if (limit) {
+         queryProducts.limit(limit);
+      }
+      if (requireCate) {
+         queryProducts.populate({
+            path: 'category',
+         });
+      }
+      if (flashSale) {
+         queryProducts.sort({ sale: -1 }); // sort sale desending
+      }
+      queryProducts.setOptions({ lean: true });
+      const productsInStock = await queryProducts.exec();
+      return productsInStock;
    } catch (error) {
       throw error;
    }
@@ -57,9 +84,10 @@ const searchProductsDAO = async (searchName) => {
    }
 }
 
+
 module.exports = {
    addProductsDAO,
    searchProductsDAO,
    getProductsDAO,
-   getCountProductsDAO
+   getCountProductsDAO,
 }

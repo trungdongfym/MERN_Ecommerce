@@ -27,7 +27,7 @@ async function updateUserDAO(userID, userUpdate) {
    try {
       const userUpdated = await Users.findOneAndUpdate({_id:userID}, userUpdate, {
          new:true,
-         runValidators:true
+         runValidators:true,
       }).exec();
       return userUpdated;
    } catch (error) {

@@ -8,7 +8,6 @@ const detailImportProductsSchema = new Schema({
    price: { type: Number, required: true }
 }, {
    versionKey: false,
-   timestamps: true
 });
 
 const DetailImportProducts = mongoose.model(
