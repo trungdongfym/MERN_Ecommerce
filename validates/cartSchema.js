@@ -1,4 +1,4 @@
-const Joi = require('Joi');
+const Joi = require('joi');
 
 const addProductToCartSchema = Joi.object().keys({
    cartItem: Joi.object().keys({
