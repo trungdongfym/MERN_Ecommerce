@@ -24,6 +24,7 @@ const authRequire = (roleArray) => {
             res.status(401).json('Invalid token');
             return;
          }
+         req.user = realUser;
          next();
       } catch (error) {
          if (error?.name === 'TokenExpiredError') {

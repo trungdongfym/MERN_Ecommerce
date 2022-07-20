@@ -17,6 +17,7 @@ const routerProducts = require('./routes/products.route');
 const routerImportProducts = require('./routes/admin/importProducts.route');
 const routerWarehoues = require('./routes/admin/wareHouse.route');
 const routerCart = require('./routes/customers/cart.route');
+const routerOrders = require('./routes/customers/order.route');
 
 // Database connect
 mongoDBConnect(process.env.DB_URL);
@@ -47,6 +48,7 @@ Router.use('/admin', routerImportProducts);
 Router.use('/admin', routerWarehoues);
 Router.use('/', routerProducts);
 Router.use('/', routerCart);
+Router.use('/', routerOrders);
 
 app.use('/api', Router);
 

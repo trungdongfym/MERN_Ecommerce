@@ -21,6 +21,11 @@ const {
    updateCartSchema
 } = require('./cartSchema');
 
+const {
+   addOrderSchema,
+   updateOrderSchema
+} = require('./orderSchema');
+
 const { validateDataRequest, validateData } = require('./validate');
 
 module.exports = {
@@ -37,5 +42,7 @@ module.exports = {
    updateCategorySchema,
    addCategorySchema,
    addProductToCartSchema,
-   updateCartSchema
+   updateCartSchema,
+   addOrderSchema,
+   updateOrderSchema
 }

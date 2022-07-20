@@ -1,9 +1,15 @@
 
-export const statusOrderEnum = {
+const statusOrderEnum = {
    PENDING: 'Pending',
    CANCELED: 'Canceled',
    APPROVED: 'Approved',
-   COMPLETE: 'Completed'
+   COMPLETE: 'Completed',
+   DELIVERY: 'Delivery'
 }
 
-export const statusOrderArray = Object.values(statusOrderEnum);
+const statusOrderArray = Object.values(statusOrderEnum);
+
+module.exports = {
+   statusOrderEnum,
+   statusOrderArray
+}

@@ -4,6 +4,11 @@ const { paymenTypeArray } = require('../utils/constants/productsConstants');
 const Schema = mongoose.Schema;
 
 const ordersSchema = new Schema({
+   user: {
+      type: mongoose.Types.ObjectId,
+      required: true,
+      ref: 'Users'
+   },
    receiveAddress: {
       type: String,
       required: true
@@ -20,14 +25,29 @@ const ordersSchema = new Schema({
       default: statusOrderEnum.PENDING
    },
    note: { type: String },
-   cart: {
-      type: mongoose.Types.ObjectId,
-      required: true,
-      unique: true,
-      ref: 'Cart'
-   }
+   orderList: [{
+      product: {
+         type: mongoose.Types.ObjectId,
+         required: true,
+         ref: 'Products'
+      },
+      amount: {
+         type: Number,
+         required: true,
+         min: 1
+      },
+      price: {
+         type: Number,
+         required: true,
+      },
+      sale: {
+         type: Number,
+         default: 0
+      }
+   }]
 }, {
-   versionKey: false
+   versionKey: false,
+   timestamps: true
 });
 
 const Orders = mongoose.model('Oders', ordersSchema, 'Orders');
