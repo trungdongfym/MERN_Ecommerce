@@ -35,7 +35,7 @@ app.use(bodyparser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('*', cors({
-  origin: 'http://localhost:3000',
+  origin: process.env.CLIENT_URL,
   maxAge: 300,
   credentials: true
 }));
