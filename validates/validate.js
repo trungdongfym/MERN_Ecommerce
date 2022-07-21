@@ -13,7 +13,6 @@ const validateDataRequest = () => async (req, res, next) => {
       if (value) next();
       else res.status(500).json('Lỗi server!');
    } catch (error) {
-      console.log(error);
       if (error?.isJoi) {
          res.json(httpErrors.BadRequest(error.message))
          return;
