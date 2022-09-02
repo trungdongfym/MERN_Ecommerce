@@ -42,5 +42,5 @@ async function updateLinkImgProducts(baseURL) {
    }
 }
 
-// updateLinkImgUsers(baseURL);
-updateLinkImgProducts(localBaseUrl);
+updateLinkImgUsers(localBaseUrl);
+// updateLinkImgProducts(localBaseUrl);

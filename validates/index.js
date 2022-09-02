@@ -1,6 +1,6 @@
-const { registerUserSchema, 
-   loginUserSchema, 
-   loginWith3rdPartySchema, 
+const { registerUserSchema,
+   loginUserSchema,
+   loginWith3rdPartySchema,
    updateUserSchemaFunction,
    changePasswordSchema,
 } = require('./userSchema');
@@ -8,7 +8,8 @@ const { registerUserSchema,
 const {
    addProductsSchema,
    addImportProductsSchema,
-   updateProductsSchema
+   updateProductsSchema,
+   queryProductSchema
 } = require('./productsSchema');
 
 const {
@@ -40,6 +41,7 @@ module.exports = {
    addImportProductsSchema,
    updateProductsSchema,
    updateCategorySchema,
+   queryProductSchema,
    addCategorySchema,
    addProductToCartSchema,
    updateCartSchema,

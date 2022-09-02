@@ -4,7 +4,7 @@ const { validateData, addOrderSchema, updateOrderSchema } = require('../../valid
 const { authOnlyOne } = require('../../middlewares/authRequire');
 const httpErrors = require('../../helpers/httpErrors');
 const Orders = require('../../models/orders.model');
-const { orderTransactionDAO } = require('../../controller.DAO/orderDAO');
+const { orderTransactionDAO, updateOrderDAO, getOrderListDAO } = require('../../controller.DAO/orderDAO');
 const DataSendFormat = require('../../helpers/dataPayload');
 const { roleArray, roleEnum } = require('../../utils/constants/userConstants');
 const { authRequire } = require('../../middlewares/authRequire');
@@ -29,7 +29,7 @@ routerOrders.post(
    async (req, res, next) => {
       const data = req.body;
       try {
-         await validateData(addOrderSchema, data);
+         req.body = await validateData(addOrderSchema, data);
          next();
       } catch (error) {
          next(error);
@@ -52,7 +52,7 @@ routerOrders.post(
          dataFormat.setErrors = null;
          res.json(dataFormat);
       } catch (error) {
-         res.status(500).json('Server internal error!');
+         res.status(500).json(error?.message || 'Unknow errors!');
       }
    }
 );
@@ -121,16 +121,27 @@ routerOrders.patch(
       try {
          const orderUpdateData = req.body;
          const { orderID } = req.params;
-         const result = await Orders.updateOne({ _id: orderID }, orderUpdateData);
-         if (result.modifiedCount === 1) {
+         const orderUpdated = await updateOrderDAO(orderID, orderUpdateData);
+         if (orderUpdated) {
             res.json({ status: true, message: 'Cập nhập đơn hàng thành công!' });
          } else {
             res.json({ status: false, message: 'Cập nhập đơn hàng thất bại!' });
          }
       } catch (error) {
-         res.status(500).json('Server internal errors!');
+         res.status(500).json(error?.message || 'Lỗi không xác định!');
       }
    }
-)
+);
+
+routerOrders.get('/orderList', authRequire(roleArray), async (req, res) => {
+   const user = req.user;
+   try {
+      const queryParams = req.query;
+      const orderList = await getOrderListDAO(queryParams, user) ?? [];
+      res.json(orderList);
+   } catch (error) {
+      res.status(500).json(error?.message || 'Lỗi không xác định!');
+   }
+});
 
 module.exports = routerOrders;

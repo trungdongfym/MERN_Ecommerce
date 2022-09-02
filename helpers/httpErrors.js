@@ -24,6 +24,10 @@ class httpErrors extends Error {
    static Unauthorized(message) {
       return new httpErrors(401, message);
    }
+
+   static ServerError(message) {
+      return new httpErrors(500, message);
+   }
 }
 
 module.exports = httpErrors;

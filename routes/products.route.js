@@ -1,12 +1,12 @@
 const express = require('express');
 const routerProducts = express.Router();
-const { addProductsSchema, validateData, updateProductsSchema } = require('../validates');
+const { addProductsSchema, validateData, updateProductsSchema, queryProductSchema } = require('../validates');
 const { uploadImage } = require('../middlewares/uploadImage');
 const { removeFileAsync } = require('../helpers/processFile');
 const httpErrors = require('../helpers/httpErrors');
 const {
    addProductsDAO, getCountProductsDAO,
-   getProductsDAO, searchProductsDAO
+   getProductsDAO, searchProductsDAO, listProductDAO
 } = require('../controller.DAO/productsDAO');
 const { authRequire } = require('../middlewares/authRequire');
 const { roleEnum, roleArray, pathImageEnum } = require('../utils/constants/userConstants');
@@ -74,6 +74,7 @@ routerProducts.get(
       const objectQuery = { limit, skip, requireCate, match, flashSale };
       try {
          const products = await getProductsDAO(objectQuery);
+
          if (match && match?._id) {
             res.json({ ...products[0] });
          } else if (limit && skip && !match) {
@@ -84,6 +85,37 @@ routerProducts.get(
          }
       } catch (error) {
          res.status(500).json('Lỗi server!');
+      }
+   }
+);
+
+routerProducts.get('/products',
+   async (req, res, next) => {
+      try {
+         const queryData = req.query;
+         const dataValidate = await validateData(queryProductSchema, queryData);
+         if (dataValidate) {
+            req.query = dataValidate;
+            next();
+         }
+         else {
+            res.status(500).json('Lỗi không xác định!');
+         }
+      } catch (error) {
+         next(error);
+      }
+   },
+   async (req, res) => {
+      const queryProduct = req.query;
+      try {
+         const queryProductClone = JSON.parse(JSON.stringify(queryProduct));
+         const dataProducts = await listProductDAO(queryProduct) ?? [];
+         res.json({
+            data: dataProducts,
+            meta: queryProductClone
+         });
+      } catch (error) {
+         res.status(500).json(error?.message || 'Unknow errors!');
       }
    }
 );
@@ -121,7 +153,7 @@ routerProducts.get(
          const product = await Products.findById(productID).populate('category').setOptions({
             lean: true
          });
-         if(!product){
+         if (!product) {
             res.status(badRequestURL.status).json(badRequestURL.message);
             return;
          }

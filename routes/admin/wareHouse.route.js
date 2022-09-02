@@ -22,7 +22,6 @@ routerWarehoues.get(
          const amountInStock = await WareHouse.find({}).count();
          res.json({ productInStock, amountInStock });
       } catch (error) {
-         console.log(error);
          res.status(500).json('Server internal error!');
       }
    }

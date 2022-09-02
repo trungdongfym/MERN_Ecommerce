@@ -68,8 +68,9 @@ routerUserCommon.post(
       try {
          // delete field avatar
          const isValid = await validateData(updateUserSchemaFunction(data), data);
-         if (isValid) next();
-         else if (file) removeFileAsync(file.path);
+         if (isValid) {
+            next();
+         } else if (file) removeFileAsync(file.path);
       } catch (error) {
          if (file) removeFileAsync(file.path);
          next(error);

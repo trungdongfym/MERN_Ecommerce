@@ -14,6 +14,13 @@ const productsSchema = new Schema({
    timestamps: true
 });
 
+productsSchema.virtual('warehouse', {
+   ref: 'WareHouse',
+   localField: '_id',
+   foreignField: 'products',
+   justOne: true,
+});
+
 const Products = mongoose.model('Products', productsSchema, 'Products');
 module.exports = Products;
 
