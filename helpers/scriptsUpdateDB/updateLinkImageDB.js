@@ -3,10 +3,11 @@ const Users = require('../../models/users.model');
 const Products = require('../../models/products.model');
 const { methodLoginEnum } = require('../../utils/constants/userConstants');
 const mongoDBConnect = require('../DBConnect/mongoConnect');
+const Categories = require('../../models/categories.model');
 
-const baseURL = 'http://18.217.35.165:8080/';
+const baseURL = 'https://ecommercefym.herokuapp.com/';
 const localBaseUrl = 'http://localhost:5000/'
-const dbUrl = 'mongodb://localhost:27017/ecommerce';
+const dbUrl = 'mongodb+srv://trungdong:Trungdong1@ecommerce.ad8cyke.mongodb.net/ecommerce';
 
 mongoDBConnect(dbUrl);
 
@@ -42,5 +43,22 @@ async function updateLinkImgProducts(baseURL) {
    }
 }
 
-updateLinkImgUsers(localBaseUrl);
-// updateLinkImgProducts(localBaseUrl);
+async function updateLinkImgCategories(baseURL) {
+   try {
+      const categories = await Categories.find({ avatarOfCate: { $exists: true } });
+      categories.map(async (category) => {
+         const { avatarOfCate, _id } = category;
+         if (avatarOfCate === '') return;
+         const avatarSplit = avatarOfCate.split('/');
+         const newAvatarUrl = baseURL + avatarSplit.slice(-2, avatarSplit.length).join('/');
+         await Categories.updateOne({ _id: _id }, { avatarOfCate: newAvatarUrl });
+      });
+      console.log('Update successfully!');
+   } catch (error) {
+      console.log(error);
+   }
+}
+
+// updateLinkImgUsers(baseURL);
+// updateLinkImgProducts(baseURL);
+updateLinkImgCategories(baseURL);
